@@ -1,4 +1,4 @@
-Ahmet Turk : property calculate & image generation
+Ahmet Turk : property calculate & image generation\n
 Mattias Chatelet : texte genereted & image generation 
 Antoine Adjamidis : Request management 
 David Pichard : api gateway (front en react) - discovery-service
