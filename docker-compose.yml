@@ -1,0 +1,89 @@
+services:
+  # sale-service:
+  #   build: ./sale-service
+  #   container_name: sale-service
+  #   ports:
+  #     - "8083:8080" # Port interne 8080 mappé au port externe 8083
+  #   networks:
+  #     - mynetwork
+  #   depends_on:
+  #     - discovery-service
+  # user-service:
+  #   build: ./user-service
+  #   container_name: user-service
+  #   ports:
+  #     - "8082:8080" # Port interne 8080 mappé au port externe 8081
+  #   networks:
+  #     - mynetwork
+  #   depends_on:
+  #     - discovery-service
+
+  # card-service:
+  #   build: ./card-service
+  #   container_name: card-service
+  #   ports:
+  #     - "8081:8080" # Port interne 8080 mappé au port externe 8082
+  #   networks:
+  #     - mynetwork
+  #   depends_on:
+  #     - discovery-service
+
+  # auth-service:
+  #   build: ./auth-service
+  #   container_name: auth-service
+  #   ports:
+  #     - "8001:8080" # Port interne 8080 mappé au port externe 8001
+  #   networks:
+  #     - mynetwork
+  #   depends_on:
+  #     - discovery-service
+
+  asi2-atelier1-db:
+    image: postgres:latest
+    container_name: asi2-atelier1-db
+    environment:
+      POSTGRES_USER: yourusername
+      POSTGRES_PASSWORD: yourpassword
+      POSTGRES_DB: asi2-atelier1
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - mynetwork
+    ports:
+      - "5432:5432" # Port PostgreSQL
+
+  discovery-service:
+    build: ./discovery-service
+    container_name: discovery-service
+    ports:
+      - "8761:8761" # Port Eureka
+    networks:
+      - mynetwork
+    depends_on:
+      - asi2-atelier1-db
+
+  api-gateway:
+    build: ./api-gateway
+    container_name: api-gateway
+    ports:
+      - "8000:8000" # Port API Gateway
+    networks:
+      - mynetwork
+    depends_on:
+      - discovery-service
+
+  # orchestrator:
+  #   build: ./orchestrator
+  #   container_name: orchestrator
+  #   ports:
+  #     - "8084:8080" # Port interne 8080 mappé au port externe 8001
+  #   networks:
+  #     - mynetwork
+  #   depends_on:
+  #     - discovery-service
+
+networks:
+  mynetwork:
+
+volumes:
+  pgdata:

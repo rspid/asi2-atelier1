@@ -1,0 +1,8 @@
+# Project exclude paths
+/card-service/target/
+/auth-service/target/
+/sale-service/target/
+/api-gateway/target/
+/user-service/target/
+/saga-orchestrator/target/
+
