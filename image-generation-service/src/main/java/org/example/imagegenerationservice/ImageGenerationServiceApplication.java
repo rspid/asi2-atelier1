@@ -18,14 +18,11 @@ public class ImageGenerationServiceApplication implements CommandLineRunner {
     }
 
     @Override
-    public void run(String... args) {
+    public void run(String... args) throws Exception {
+        // Code to execute when the application starts, for example:
+        System.out.println("Image Generation Service Application has started.");
 
-        // Crée une requête et l'envoie dans la file d'attente ActiveMQ
-        ImageGenerationRequest request = new ImageGenerationRequest();
-        request.setRequestId(requestId);
-        request.setPrompt(prompt);
-
-        System.out.println("Sending message to ActiveMQ with Request ID: " + requestId);
-        messageQueueService.sendMessageToQueue(request);
+        // You can use the messageQueueService here if needed
+        // messageQueueService.processMessages(); // Example usage
     }
 }

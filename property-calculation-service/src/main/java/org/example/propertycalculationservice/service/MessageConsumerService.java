@@ -37,7 +37,6 @@ public class MessageConsumerService {
             // Utiliser la librairie pour générer les propriétés
             Map<String, Float> properties = ImgToProperties.getPropertiesFromImg(imageUrl, 100f, 4, 0.3f, true);
 
-
             // Créer l'objet CardProperties
             CardProperties cardProperties = new CardProperties(message.getRequestId(), properties);
 

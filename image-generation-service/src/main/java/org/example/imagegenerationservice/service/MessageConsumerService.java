@@ -3,7 +3,6 @@ package org.example.imagegenerationservice.service;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.example.imagegenerationservice.model.ImageGenerationRequest;
 import org.example.imagegenerationservice.model.NeuralLovePromptRequest;
-import org.example.propertycalculationservice.model.ImageProcessedMessage; // Assurez-vous d'importer cette classe
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
@@ -66,9 +65,6 @@ public class MessageConsumerService {
             // Envoi à l'orchestrateur
             sendToOrchestrator(request.getRequestId(), generatedImage);
 
-            // Notifier que l'image a été générée
-            notifyImageGenerated(request.getRequestId(), generatedImage);
-
         } catch (Exception e) {
             System.err.println("Erreur lors de la consommation du message : " + e.getMessage());
             e.printStackTrace();
@@ -83,23 +79,6 @@ public class MessageConsumerService {
                 .retrieve()
                 .bodyToMono(Void.class)
                 .block();
-    }
-
-    private void notifyImageGenerated(String requestId, String generatedImage) {
-        try {
-            // Crée un message avec l'ID de requête et l'URL de l'image
-            ImageProcessedMessage message = new ImageProcessedMessage(requestId, generatedImage);
-            String messageJson = objectMapper.writeValueAsString(message);
-
-            // Envoie le message à la file 'imageGeneratedQueue'
-            jmsTemplate.convertAndSend("imageGeneratedQueue", messageJson);
-
-            // Journaliser l'envoi
-            System.out.println("Notified image generation for requestId: " + requestId);
-        } catch (Exception e) {
-            System.err.println("Erreur lors de l'envoi du message à imageGeneratedQueue : " + e.getMessage());
-            e.printStackTrace();
-        }
     }
 
     // Classe interne pour la requête à l'orchestrateur

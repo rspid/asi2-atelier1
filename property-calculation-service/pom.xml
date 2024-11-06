@@ -42,12 +42,19 @@
         </dependency>
 
         <dependency>
+            <groupId>jakarta.websocket</groupId>
+            <artifactId>jakarta.websocket-api</artifactId>
+            <version>2.0.0</version> <!-- Ou choisissez une version compatible -->
+        </dependency>
+
+        <dependency>
             <groupId>de.androidpit</groupId>
             <artifactId>colorToproperties</artifactId>
             <version>1.1.2</version>
-            <scope>system</scope>
-            <systemPath>${project.basedir}/../libs/colorToproperties-1.1.2.jar</systemPath>
+            <scope>compile</scope>
         </dependency>
+
+
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-webflux</artifactId>
