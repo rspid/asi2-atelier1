@@ -1,5 +1,7 @@
 package org.example.requestmanagementservice.entity;
 
+import java.util.UUID;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -8,8 +10,8 @@ import jakarta.persistence.Id;
 @Entity
 public class CardRequest {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @GeneratedValue(strategy = GenerationType.AUTO) // Génère un UUID
+    private UUID id; // Utilise UUID comme ID principal
 
     private String userId;
     private String promptImage;
@@ -17,11 +19,11 @@ public class CardRequest {
     private String status;
 
     // Getters et Setters
-    public Long getId() {
+    public UUID getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(UUID id) {
         this.id = id;
     }
 
