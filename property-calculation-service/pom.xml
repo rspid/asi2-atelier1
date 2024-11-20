@@ -3,89 +3,125 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
                              https://maven.apache.org/xsd/maven-4.0.0.xsd">
-<modelVersion>4.0.0</modelVersion>
-<parent>
-    <groupId>org.springframework.boot</groupId>
-    <artifactId>spring-boot-starter-parent</artifactId>
-    <version>3.3.4</version>
-    <relativePath/> <!-- lookup parent from repository -->
-</parent>
-<groupId>org.example</groupId>
-<artifactId>property-calculation-service</artifactId>
-<version>0.0.1-SNAPSHOT</version>
-<name>property-calculation-service</name>
-<description>property-calculation-service</description>
-<properties>
-    <java.version>17</java.version>
-</properties>
-<dependencies>
-    <!-- Spring Boot Starter WebFlux pour le serveur réactif -->
-    <dependency>
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
         <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-starter-webflux</artifactId>
-    </dependency>
-
-    <!-- Spring Boot Starter JMS -->
-    <dependency>
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-starter-activemq</artifactId>
-    </dependency>
-
-    <!-- ActiveMQ Broker (optionnel) -->
-    <dependency>
-        <groupId>org.apache.activemq</groupId>
-        <artifactId>activemq-broker</artifactId>
-        <scope>runtime</scope>
-    </dependency>
-
-    <!-- Jackson pour la sérialisation JSON -->
-    <dependency>
-        <groupId>com.fasterxml.jackson.core</groupId>
-        <artifactId>jackson-databind</artifactId>
-    </dependency>
-
-    <!-- Validation API -->
-    <dependency>
-        <groupId>jakarta.validation</groupId>
-        <artifactId>jakarta.validation-api</artifactId>
-    </dependency>
-
-    <!-- Annotations JetBrains -->
-    <dependency>
-        <groupId>org.jetbrains</groupId>
-        <artifactId>annotations</artifactId>
-        <version>26.0.1</version>
-        <scope>compile</scope>
-    </dependency>
-
-    <!-- colorToproperties -->
-    <dependency>
-        <groupId>de.androidpit</groupId>
-        <artifactId>colorToproperties</artifactId>
-        <version>1.1.2</version>
-        <scope>system</scope>
-        <systemPath>${project.basedir}/../libs/colorToproperties-1.1.2.jar</systemPath>
-    </dependency>
-
-    <!-- Spring JMS -->
-    <dependency>
-        <groupId>org.springframework</groupId>
-        <artifactId>spring-jms</artifactId>
-    </dependency>
-
-    <!-- Spring Boot Starter Test -->
-    <dependency>
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-starter-test</artifactId>
-        <scope>test</scope>
-    </dependency>
-</dependencies>
-<build>
-    <plugins>
-        <plugin>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>3.3.4</version>
+        <relativePath/> <!-- lookup parent from repository -->
+    </parent>
+    <groupId>org.example</groupId>
+    <artifactId>property-calculation-service</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+    <name>property-calculation-service</name>
+    <description>property-calculation-service</description>
+    <properties>
+        <java.version>17</java.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+    </properties>
+    <dependencies>
+        <!-- Spring Boot Starter WebFlux pour le serveur réactif -->
+        <dependency>
             <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-maven-plugin</artifactId>
-        </plugin>
-    </plugins>
-</build>
+            <artifactId>spring-boot-starter-webflux</artifactId>
+        </dependency>
+
+        <!-- Spring Boot Starter JMS -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-activemq</artifactId>
+        </dependency>
+
+        <!-- ActiveMQ Broker (optionnel) -->
+        <dependency>
+            <groupId>org.apache.activemq</groupId>
+            <artifactId>activemq-broker</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+
+        <!-- Jackson pour la sérialisation JSON -->
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+        </dependency>
+
+        <!-- Validation API -->
+        <dependency>
+            <groupId>jakarta.validation</groupId>
+            <artifactId>jakarta.validation-api</artifactId>
+        </dependency>
+
+        <!-- Annotations JetBrains -->
+        <dependency>
+            <groupId>org.jetbrains</groupId>
+            <artifactId>annotations</artifactId>
+            <version>26.0.1</version>
+            <scope>compile</scope>
+        </dependency>
+
+        <!-- colorToproperties -->
+        <dependency>
+            <groupId>de.androidpit</groupId>
+            <artifactId>colorToproperties</artifactId>
+            <version>1.1.2</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/../libs/colorToproperties-1.1.2.jar</systemPath>
+        </dependency>
+
+        <!-- Spring JMS -->
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-jms</artifactId>
+        </dependency>
+
+        <!-- Spring Boot Starter Test -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+    <build>
+        <resources>
+            <!-- Ressources filtrées, excluant les fichiers de propriétés spécifiques -->
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+                <excludes>
+                    <exclude>application.properties</exclude>
+                    <exclude>application_temp.properties</exclude>
+                </excludes>
+            </resource>
+            <!-- Ressources non filtrées pour les fichiers de propriétés -->
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>false</filtering>
+                <includes>
+                    <include>application.properties</include>
+                    <include>application_temp.properties</include>
+                </includes>
+            </resource>
+        </resources>
+        <testResources>
+            <testResource>
+                <directory>src/test/resources</directory>
+                <filtering>true</filtering>
+            </testResource>
+        </testResources>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-resources-plugin</artifactId>
+                <version>3.3.1</version>
+                <configuration>
+                    <encoding>UTF-8</encoding>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 </project>

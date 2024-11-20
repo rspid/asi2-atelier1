@@ -35,10 +35,10 @@ public class MessageConsumerService {
             // Utiliser la librairie pour obtenir les propriétés de l'image
             Map<String, Float> properties = ImgToProperties.getPropertiesFromImg(
                     request.getImageUrl(),
-                    100f,    // valueToDispatch
-                    4,       // nb_of_colors
-                    0.3f,    // randPart
-                    false     // isBase64?
+                    100f, // valueToDispatch
+                    4, // nb_of_colors
+                    0.3f, // randPart
+                    false // isBase64?
             );
 
             // Créer la réponse
@@ -56,7 +56,7 @@ public class MessageConsumerService {
     private void sendToOrchestrator(ImagePropertiesResponse response) {
         try {
             webClient.post()
-                    .uri(orchestratorUrl + "/api/cards/reponse/properties")
+                    .uri(orchestratorUrl + "/api/cards/response/properties")
                     .contentType(MediaType.APPLICATION_JSON)
                     .bodyValue(response)
                     .retrieve()
