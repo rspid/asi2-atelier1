@@ -54,13 +54,6 @@
             <version>23.0.0</version>
         </dependency>
 
-        <!-- Dependency on property-calculation-service -->
-        <dependency>
-            <groupId>org.example</groupId>
-            <artifactId>property-calculation-service</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
-        </dependency>
-
         <!-- Test dependencies -->
         <dependency>
             <groupId>org.springframework.boot</groupId>

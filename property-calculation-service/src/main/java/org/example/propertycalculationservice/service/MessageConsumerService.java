@@ -1,64 +1,69 @@
 package org.example.propertycalculationservice.service;
 
-import org.example.propertycalculationservice.model.ImageProcessedMessage;
-import org.example.propertycalculationservice.model.CardProperties;
-import tp.cpe.ImgToProperties; // Assurez-vous que c'est le bon package
+import org.example.propertycalculationservice.model.ImagePropertiesRequest;
+import org.example.propertycalculationservice.model.ImagePropertiesResponse;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.MediaType;
 import org.springframework.jms.annotation.JmsListener;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
+import tp.cpe.ImgToProperties;
 
 import java.util.Map;
 
 @Service
+
 public class MessageConsumerService {
 
-    private final ObjectMapper objectMapper;
     private final WebClient webClient;
+    private final ObjectMapper objectMapper;
 
     @Value("${orchestrator.url}")
     private String orchestratorUrl;
 
     public MessageConsumerService(ObjectMapper objectMapper) {
-        this.objectMapper = objectMapper;
         this.webClient = WebClient.builder().build();
+        this.objectMapper = objectMapper;
     }
 
-    @JmsListener(destination = "imageGeneratedQueue")
+    @JmsListener(destination = "imagePropertiesQueue")
     public void consumeMessage(String messageJson) {
         try {
-            // Désérialiser le message reçu
-            ImageProcessedMessage message = objectMapper.readValue(messageJson, ImageProcessedMessage.class);
+            ImagePropertiesRequest request = objectMapper.readValue(messageJson, ImagePropertiesRequest.class);
 
-            // Récupérer l'URL de l'image
-            String imageUrl = message.getImageUrl();
+            // Utiliser la librairie pour obtenir les propriétés de l'image
+            Map<String, Float> properties = ImgToProperties.getPropertiesFromImg(
+                    request.getImageUrl(),
+                    100f,    // valueToDispatch
+                    4,       // nb_of_colors
+                    0.3f,    // randPart
+                    false     // isBase64?
+            );
 
-            // Utiliser la librairie pour générer les propriétés
-            Map<String, Float> properties = ImgToProperties.getPropertiesFromImg(imageUrl, 100f, 4, 0.3f, true);
+            // Créer la réponse
+            ImagePropertiesResponse response = new ImagePropertiesResponse(request.getRequestId(), properties);
 
-            // Créer l'objet CardProperties
-            CardProperties cardProperties = new CardProperties(message.getRequestId(), properties);
-
-            // Envoyer les propriétés à l'orchestrateur
-            sendToOrchestrator(cardProperties);
+            // Envoyer le résultat à l'orchestrateur
+            sendToOrchestrator(response);
 
         } catch (Exception e) {
-            // Gérer les exceptions
+            // Gérer l'exception de manière appropriée
             e.printStackTrace();
         }
     }
 
-    private void sendToOrchestrator(CardProperties cardProperties) {
+    private void sendToOrchestrator(ImagePropertiesResponse response) {
         try {
             webClient.post()
-                    .uri(orchestratorUrl + "/api/v1/receive-card-properties")
-                    .bodyValue(cardProperties)
+                    .uri(orchestratorUrl + "/api/cards/reponse/properties")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .bodyValue(response)
                     .retrieve()
                     .bodyToMono(Void.class)
                     .block();
         } catch (Exception e) {
-            // Gérer les exceptions
+            // Gérer l'exception de manière appropriée
             e.printStackTrace();
         }
     }
