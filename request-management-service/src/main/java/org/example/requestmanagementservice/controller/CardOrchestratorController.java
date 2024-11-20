@@ -36,4 +36,14 @@ public class CardOrchestratorController {
         return ResponseEntity.ok("Text description received and image request triggered");
     }
 
+    @PostMapping("/response/image")
+    public ResponseEntity<String> receiveImageResponse(@RequestBody OrchestratorRequest request) {
+        System.out.println("Controller : Card Request ID: " + request.getRequestId() + ", Image URL: "
+                + request.getgeneratedImage());
+        UUID cardRequestId = UUID.fromString(request.getRequestId());
+        // Recevoir la réponse du microservice d'image et mettre à jour la demande
+        cardOrchestratorService.updateImage(cardRequestId, request.getgeneratedImage());
+        return ResponseEntity.ok("Image URL received and processed successfully");
+    }
+
 }
