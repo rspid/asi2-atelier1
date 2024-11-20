@@ -1,5 +1,6 @@
 package org.example.requestmanagementservice.entity;
 
+import java.util.Map;
 import java.util.UUID;
 
 import jakarta.persistence.Entity;
@@ -17,6 +18,10 @@ public class CardRequest {
     private String promptImage;
     private String promptText;
     private String status;
+    private Float hp;
+    private Float attack;
+    private Float defense;
+    private Float energy;
 
     // Getters et Setters
     public UUID getId() {
@@ -57,6 +62,38 @@ public class CardRequest {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public Float getHp() {
+        return hp;
+    }
+
+    public void setHp(Float hp) {
+        this.hp = hp;
+    }
+
+    public Float getAttack() {
+        return attack;
+    }
+
+    public void setAttack(Float attack) {
+        this.attack = attack;
+    }
+
+    public Float getDefense() {
+        return defense;
+    }
+
+    public void setDefense(Float defense) {
+        this.defense = defense;
+    }
+
+    public Float getEnergy() {
+        return energy;
+    }
+
+    public void setEnergy(Float energy) {
+        this.energy = energy;
     }
 
 }

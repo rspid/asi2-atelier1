@@ -1,6 +1,7 @@
 package org.example.requestmanagementservice.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.example.requestmanagementservice.entity.CardRequest;
 import org.example.requestmanagementservice.repository.CardRequestRepository;
@@ -14,6 +15,10 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.JsonNode;
 
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -92,7 +97,7 @@ public class CardOrchestratorService {
         System.out.println("\n\n\nupdateTextAndTriggerImageRequest started : " + cardRequestId);
         if (optionalCardRequest.isPresent()) {
             CardRequest cardRequest = optionalCardRequest.get();
-            cardRequest.setPromptText(description);
+            cardRequest.setPromptText(extractValue(description, "response"));
             cardRequest.setStatus("TEXT_RECEIVED");
             cardRequestRepository.save(cardRequest);
 
@@ -124,15 +129,59 @@ public class CardOrchestratorService {
         }
     }
 
-    public void updateImage(UUID cardRequestId, String imageUrl) {
+    public void updateImageAndTriggerPropertiesRequest(UUID cardRequestId, String imageUrl) {
         // Mettre à jour l'URL de l'image dans la base de données et marquer la demande
         // comme "COMPLETED"
         Optional<CardRequest> optionalCardRequest = cardRequestRepository.findById(cardRequestId);
         if (optionalCardRequest.isPresent()) {
             CardRequest cardRequest = optionalCardRequest.get();
-            cardRequest.setPromptImage(imageUrl);
+            cardRequest.setPromptImage(extractValue(imageUrl, "url"));
+            cardRequest.setStatus("IMAGE_RECEIVED");
+            cardRequestRepository.save(cardRequest);
+
+            // Construire le corps de la requête pour l'API d'image
+            Map<String, Object> requestBody = new HashMap<>();
+            requestBody.put("requestId", cardRequestId.toString());
+            requestBody.put("imageUrl", extractAndTransformUrl(imageUrl));
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+
+            HttpEntity<Map<String, Object>> request = new HttpEntity<>(requestBody, headers);
+
+            // Appeler l'API d'image
+            String imageServiceUrl = "http://localhost:8089/api/properties";
+            try {
+                System.out.println("Calling image service with JSON body: " + requestBody);
+                ResponseEntity<String> response = restTemplate.exchange(
+                        imageServiceUrl,
+                        HttpMethod.POST,
+                        request,
+                        String.class);
+            } catch (Exception e) {
+                System.err.println("Error calling image service: " + e.getMessage());
+            }
+            System.out.println("updateImageAndTriggerPropertiesRequest completed : " + cardRequestId + "\n\n\n\n");
+        }
+
+    }
+
+    public void updateProperties(UUID cardRequestId, Map<String, Float> properties) {
+        Float defense = properties.get("DEFENSE");
+        Float energy = properties.get("ENERGY");
+        Float hp = properties.get("HP");
+        Float attack = properties.get("ATTACK");
+        // Mettre à jour les propriétés de la carte dans la base de données
+        Optional<CardRequest> optionalCardRequest = cardRequestRepository.findById(cardRequestId);
+        if (optionalCardRequest.isPresent()) {
+            CardRequest cardRequest = optionalCardRequest.get();
+            cardRequest.setAttack(attack);
+            cardRequest.setDefense(defense);
+            cardRequest.setEnergy(energy);
+            cardRequest.setHp(hp);
             cardRequest.setStatus("COMPLETED");
             cardRequestRepository.save(cardRequest);
+            System.out.println("Properties updated for card request ID: " + cardRequestId);
         }
     }
 
@@ -147,6 +196,46 @@ public class CardOrchestratorService {
             CardRequest cardRequest = optionalCardRequest.get();
             cardRequest.setStatus(status);
             cardRequestRepository.save(cardRequest);
+        }
+    }
+
+    public static String extractAndTransformUrl(String jsonString) {
+        // Expression régulière pour extraire la valeur de "url"
+        String regex = "\"url\"\\s*:\\s*\"(.*?)\"";
+        Pattern pattern = Pattern.compile(regex);
+        Matcher matcher = pattern.matcher(jsonString);
+
+        if (matcher.find()) {
+            String extractedUrl = matcher.group(1); // Extrait "/static/imgs/default-2.jpg"
+
+            // Supprimer le préfixe "/static" si présent
+            String cleanedPath = extractedUrl.replaceFirst("^/static/", "");
+
+            // Ajouter "localhost:8080/" devant le chemin nettoyé
+            String finalUrl = "http://localhost:8080/" + cleanedPath;
+
+            return finalUrl;
+        } else {
+            // Si "url" n'est pas trouvé dans la chaîne JSON
+            System.err.println("Aucune correspondance trouvée pour 'url' dans la chaîne JSON.");
+            return null;
+        }
+    }
+
+    public static String extractValue(String jsonString, String key) {
+        try {
+            ObjectMapper objectMapper = new ObjectMapper();
+            JsonNode rootNode = objectMapper.readTree(jsonString);
+            JsonNode valueNode = rootNode.path(key);
+            if (!valueNode.isMissingNode() && !valueNode.isNull()) {
+                return valueNode.asText();
+            } else {
+                System.err.println("La clé \"" + key + "\" est absente ou a une valeur null dans la chaîne JSON.");
+                return null;
+            }
+        } catch (Exception e) {
+            System.err.println("Erreur lors de l'analyse de la chaîne JSON : " + e.getMessage());
+            return null;
         }
     }
 }

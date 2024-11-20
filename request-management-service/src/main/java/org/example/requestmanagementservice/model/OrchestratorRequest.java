@@ -1,5 +1,6 @@
 package org.example.requestmanagementservice.model;
 
+import java.util.Map;
 import java.util.UUID;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -18,7 +19,7 @@ public class OrchestratorRequest {
     private String requestId;
 
     @JsonProperty("properties")
-    private String properties;
+    private Map<String, Float> properties;
 
     // constructeur vide
     public OrchestratorRequest() {
@@ -63,11 +64,11 @@ public class OrchestratorRequest {
         this.requestId = requestId;
     }
 
-    public String getProperties() {
+    public Map<String, Float> getProperties() {
         return properties;
     }
 
-    public void setProperties(String properties) {
+    public void setProperties(Map<String, Float> properties) {
         this.properties = properties;
     }
 }
