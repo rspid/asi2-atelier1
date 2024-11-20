@@ -1,56 +1,19 @@
 services:
-  # sale-service:
-  #   build: ./sale-service
-  #   container_name: sale-service
-  #   ports:
-  #     - "8083:8080" # Port interne 8080 mappé au port externe 8083
-  #   networks:
-  #     - mynetwork
-  #   depends_on:
-  #     - discovery-service
-  # user-service:
-  #   build: ./user-service
-  #   container_name: user-service
-  #   ports:
-  #     - "8082:8080" # Port interne 8080 mappé au port externe 8081
-  #   networks:
-  #     - mynetwork
-  #   depends_on:
-  #     - discovery-service
-
-  # card-service:
-  #   build: ./card-service
-  #   container_name: card-service
-  #   ports:
-  #     - "8081:8080" # Port interne 8080 mappé au port externe 8082
-  #   networks:
-  #     - mynetwork
-  #   depends_on:
-  #     - discovery-service
-
-  # auth-service:
-  #   build: ./auth-service
-  #   container_name: auth-service
-  #   ports:
-  #     - "8001:8080" # Port interne 8080 mappé au port externe 8001
-  #   networks:
-  #     - mynetwork
-  #   depends_on:
-  #     - discovery-service
 
   asi2-atelier1-db:
-    image: postgres:latest
+    image: mysql:latest
     container_name: asi2-atelier1-db
     environment:
-      POSTGRES_USER: yourusername
-      POSTGRES_PASSWORD: yourpassword
-      POSTGRES_DB: asi2-atelier1
+      MYSQL_ROOT_PASSWORD: admin
+      MYSQL_DATABASE: request_management_db
+      MYSQL_USER: root
+      MYSQL_PASSWORD: admin
     volumes:
-      - pgdata:/var/lib/postgresql/data
+      - mysqldata:/var/lib/mysql
     networks:
       - mynetwork
     ports:
-      - "5432:5432" # Port PostgreSQL
+      - "3306:3306"
 
   discovery-service:
     build: ./discovery-service
@@ -72,18 +35,87 @@ services:
     depends_on:
       - discovery-service
 
-  # orchestrator:
-  #   build: ./orchestrator
-  #   container_name: orchestrator
-  #   ports:
-  #     - "8084:8080" # Port interne 8080 mappé au port externe 8001
-  #   networks:
-  #     - mynetwork
-  #   depends_on:
-  #     - discovery-service
+  orchestrator:
+    build: ./request-management-service
+    container_name: orchestrator
+    ports:
+      - "7070:7070" # Port interne 8080 mappé au port externe 8084
+    networks:
+      - mynetwork
+    depends_on:
+      - discovery-service
+  
+  text-generation-service:
+    build: ./text-generation-service
+    container_name: text-generation-service
+    ports:
+      - "8083:8083" # Port interne 8080 mappé au port externe 8085
+    networks:
+      - mynetwork
+    depends_on:
+      - discovery-service
+
+  image-generation-service:
+    build: ./image-generation-service
+    container_name: image-generation-service
+    ports:
+      - "8081:8081" # Port interne 8080 mappé au port externe 8086
+    networks:
+      - mynetwork
+    depends_on:
+      - discovery-service
+    
+  property-service:
+    build: ./property-calculation-service
+    container_name: property-calculation-service
+    ports:
+      - "8089:8089" # Port interne 8080 mappé au port externe 8087
+    networks:
+      - mynetwork
+    depends_on:
+      - discovery-service
+  
+  backend-service:
+    build: ./backend
+    container_name: backend-service
+    ports:
+      - "8088:8080" # Port interne 8080 mappé au port externe 8088
+    networks:
+      - mynetwork
+    depends_on:
+      - discovery-service
+  
+  activemq:
+    image: symptoma/activemq:5.18.3
+    ports:
+      - "61616:61616"
+      - "61613:61613"
+      - "8161:8161"
+    environment:
+      ACTIVEMQ_DISALLOW_WEBCONSOLE: 'false'
+      ACTIVEMQ_USERNAME: myuser
+      ACTIVEMQ_PASSWORD: mypwd
+      ACTIVEMQ_WEBADMIN_USERNAME: myuserweb
+      ACTIVEMQ_WEBADMIN_PASSWORD: mypwd
+
+  img-gen-ln:
+    image: registry.gitlab.com/js-asi2/asi2-resources/img-gene-neural-love-api:v1.1
+    ports:
+      - "8080:8080"
+    environment:
+      external.iaimgapi.token: 'v1.811d96c7bbbd148ae0b4bd54baf8abdfee0d0dbb6f2d4321e6edb49dc30f0abd'
+
+  ollama-local:
+    image: ollama/ollama
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama:/root/.ollama
 
 networks:
   mynetwork:
 
 volumes:
+  mysqldata: # Ajout du volume manquant pour asi2-atelier1-db
   pgdata:
+  ollama:
