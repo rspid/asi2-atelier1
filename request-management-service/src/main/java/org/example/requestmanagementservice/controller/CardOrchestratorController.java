@@ -1,10 +1,14 @@
 package org.example.requestmanagementservice.controller;
 
 import org.example.requestmanagementservice.entity.CardRequest;
+import org.example.requestmanagementservice.model.GenerationResponse;
+import org.example.requestmanagementservice.model.OrchestratorRequest;
 import org.example.requestmanagementservice.service.CardOrchestratorService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/cards")
@@ -21,18 +25,24 @@ public class CardOrchestratorController {
     }
 
     @PostMapping("/response/text")
-    public ResponseEntity<String> receiveTextResponse(@RequestParam Long cardRequestId,
-            @RequestBody String description) {
-        // Mettre à jour la demande de carte avec le texte généré
-        System.out.println("Received text description: " + description);
-        cardOrchestratorService.updateTextAndTriggerImageRequest(cardRequestId, description);
+    public ResponseEntity<String> receiveTextResponse(@RequestBody OrchestratorRequest request) {
+        if (request.getGeneratedText() == null) {
+            return ResponseEntity.badRequest().body("Text description is required");
+        }
+        UUID cardRequestId = UUID.fromString(request.getCardRequestId()); // Conversion de String à UUID
+        String generatedText = request.getGeneratedText();
+        System.out.println("Controller : Card Request ID: " + cardRequestId + ", Generated Text: " + generatedText);
+        cardOrchestratorService.updateTextAndTriggerImageRequest(cardRequestId, generatedText);
         return ResponseEntity.ok("Text description received and image request triggered");
     }
 
     @PostMapping("/response/image")
-    public ResponseEntity<String> receiveImageResponse(@RequestParam Long cardRequestId, @RequestBody String imageUrl) {
+    public ResponseEntity<String> receiveImageResponse(@RequestBody OrchestratorRequest request) {
+        System.out.println("Controller : Card Request ID: " + request.getRequestId() + ", Image URL: "
+                + request.getgeneratedImage());
+        UUID cardRequestId = UUID.fromString(request.getRequestId());
         // Recevoir la réponse du microservice d'image et mettre à jour la demande
-        cardOrchestratorService.updateImage(cardRequestId, imageUrl);
+        cardOrchestratorService.updateImage(cardRequestId, request.getgeneratedImage());
         return ResponseEntity.ok("Image URL received and processed successfully");
     }
 }

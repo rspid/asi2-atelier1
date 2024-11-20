@@ -73,7 +73,7 @@ public class MessageConsumerService {
 
     private void sendToOrchestrator(String requestId, String generatedImage) {
         webClient.post()
-                .uri(orchestratorUrl + "/api/v1/receive-generated-image")
+                .uri(orchestratorUrl + "/api/cards/response/image")
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(new OrchestratorRequest(requestId, generatedImage))
                 .retrieve()
