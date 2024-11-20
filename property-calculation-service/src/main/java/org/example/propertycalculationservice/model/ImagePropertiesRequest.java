@@ -1,19 +1,17 @@
 package org.example.propertycalculationservice.model;
 
-public class ImageProcessedMessage {
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
+import java.io.Serializable;
+
+public class ImagePropertiesRequest implements Serializable {
+    @NotNull
     private String requestId;
+
+    @NotEmpty
     private String imageUrl;
 
-    // Constructeurs, getters et setters
-
-    public ImageProcessedMessage() {
-    }
-
-    public ImageProcessedMessage(String requestId, String imageUrl) {
-        this.requestId = requestId;
-        this.imageUrl = imageUrl;
-    }
-
+    // Getters et Setters
     public String getRequestId() {
         return requestId;
     }

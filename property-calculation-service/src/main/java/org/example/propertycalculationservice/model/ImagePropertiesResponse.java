@@ -2,20 +2,16 @@ package org.example.propertycalculationservice.model;
 
 import java.util.Map;
 
-public class CardProperties {
+public class ImagePropertiesResponse {
     private String requestId;
     private Map<String, Float> properties;
 
-    // Constructeurs, getters et setters
-
-    public CardProperties() {
-    }
-
-    public CardProperties(String requestId, Map<String, Float> properties) {
+    public ImagePropertiesResponse(String requestId, Map<String, Float> properties) {
         this.requestId = requestId;
         this.properties = properties;
     }
 
+    // Getters et Setters
     public String getRequestId() {
         return requestId;
     }
