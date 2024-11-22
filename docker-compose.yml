@@ -1,18 +1,26 @@
 services:
 
   asi2-atelier1-db:
-    image: mysql:latest
+    image: postgres:latest
     container_name: asi2-atelier1-db
     environment:
-      MYSQL_ROOT_PASSWORD: "admin"
-      MYSQL_DATABASE: request_management_db
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: request_management_db
     volumes:
-      - mysqldata:/var/lib/mysql
+      - pgdata:/var/lib/postgresql/data
     networks:
       - mynetwork
     ports:
-      - "3306:3306"
-  
+      - "5432:5432" # Port PostgreSQL
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U admin -d request_management_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+
   discovery-service:
     build: ./discovery-service
     container_name: discovery-service
@@ -21,7 +29,8 @@ services:
     networks:
       - mynetwork
     depends_on:
-      - asi2-atelier1-db
+      asi2-atelier1-db:
+        condition: service_healthy
 
   api-gateway:
     build: ./api-gateway
@@ -37,18 +46,17 @@ services:
     build: ./request-management-service
     container_name: orchestrator
     ports:
-      - "7070:7070" # Port interne 8080 mappé au port externe 8084
+      - "7070:7070" # Port Orchestrator
     networks:
       - mynetwork
     depends_on:
       - discovery-service
-      - asi2-atelier1-db
-  
+
   text-generation-service:
     build: ./text-generation-service
     container_name: text-generation-service
     ports:
-      - "8083:8083" # Port interne 8080 mappé au port externe 8085
+      - "8083:8083" # Port Text Generation Service
     networks:
       - mynetwork
     depends_on:
@@ -58,32 +66,32 @@ services:
     build: ./image-generation-service
     container_name: image-generation-service
     ports:
-      - "8081:8081" # Port interne 8080 mappé au port externe 8086
+      - "8081:8081" # Port Image Generation Service
     networks:
       - mynetwork
     depends_on:
       - discovery-service
-    
+
   property-service:
     build: ./property-calculation-service
     container_name: property-calculation-service
     ports:
-      - "8089:8089" # Port interne 8080 mappé au port externe 8087
+      - "8089:8089" # Port Property Service
     networks:
       - mynetwork
     depends_on:
       - discovery-service
-  
+
   backend-service:
     build: ./backend
     container_name: backend-service
     ports:
-      - "8088:8080" # Port interne 8080 mappé au port externe 8088
+      - "8088:8080" # Port Backend Service
     networks:
       - mynetwork
     depends_on:
       - discovery-service
-  
+
   activemq:
     image: symptoma/activemq:5.18.3
     ports:
@@ -115,6 +123,5 @@ networks:
   mynetwork:
 
 volumes:
-  mysqldata: # Ajout du volume manquant pour asi2-atelier1-db
   pgdata:
   ollama:
