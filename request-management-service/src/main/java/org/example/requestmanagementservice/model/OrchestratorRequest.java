@@ -18,6 +18,9 @@ public class OrchestratorRequest {
     @JsonProperty("requestId")
     private String requestId;
 
+    @JsonProperty("userId")
+    private String userId;
+
     @JsonProperty("properties")
     private Map<String, Float> properties;
 
@@ -70,5 +73,13 @@ public class OrchestratorRequest {
 
     public void setProperties(Map<String, Float> properties) {
         this.properties = properties;
+    }
+
+    public String getUserId() {
+        return userId;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
     }
 }

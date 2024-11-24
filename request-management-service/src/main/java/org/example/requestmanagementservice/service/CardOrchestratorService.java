@@ -3,6 +3,8 @@ package org.example.requestmanagementservice.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
+import org.example.requestmanagementservice.dto.CardRequestDto;
 import org.example.requestmanagementservice.entity.CardRequest;
 import org.example.requestmanagementservice.repository.CardRequestRepository;
 import org.example.requestmanagementservice.model.GenerationRequest;
@@ -14,6 +16,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -39,10 +42,11 @@ public class CardOrchestratorService {
     // Champs de classe pour stocker les valeurs
     private UUID cardRequestId;
 
-    public CardRequest createCardRequest() {
+    public CardRequest createCardRequest(String userId) {
         // Créer une nouvelle demande de carte et définir son statut initial
         CardRequest cardRequest = new CardRequest();
         cardRequest.setStatus("PROCESSING");
+        cardRequest.setUserId(userId);
 
         // Enregistrer la demande dans la base de données pour générer un ID
         cardRequest = cardRequestRepository.save(cardRequest);
@@ -59,10 +63,15 @@ public class CardOrchestratorService {
 
     private void processCardRequest() {
         try {
-            // Débiter l'utilisateur
-            boolean debitSuccess = debitUser();
-            if (!debitSuccess) {
-                updateCardStatus(cardRequestId, "FAILED");
+            Optional<CardRequest> optionalCardRequest = cardRequestRepository.findById(cardRequestId);
+            if (optionalCardRequest.isPresent()) {
+                CardRequest cardRequest = optionalCardRequest.get();
+                if (!debitUser(cardRequest.getUserId())) {
+                    updateCardStatus(cardRequestId, "INSUFFICIENT_FUNDS");
+                    return;
+                }
+            } else {
+                updateCardStatus(cardRequestId, "USER_NOT_FOUND");
                 return;
             }
 
@@ -185,9 +194,32 @@ public class CardOrchestratorService {
         }
     }
 
-    private boolean debitUser() {
-        // Simuler le débit de l'utilisateur
-        return true;
+    private boolean debitUser(String userId) {
+        // URL de l'endpoint pour débiter l'utilisateur
+        String url = "http://localhost:8084/user/" + userId + "/debit";
+
+        try {
+            // Utiliser RestTemplate pour appeler l'endpoint
+            RestTemplate restTemplate = new RestTemplate();
+            ResponseEntity<Boolean> response = restTemplate.exchange(
+                    url,
+                    HttpMethod.POST,
+                    null,
+                    Boolean.class);
+
+            // Retourner directement la réponse (true ou false)
+            System.out.println("User debited successfully: " + response.getBody());
+            return Boolean.TRUE.equals(response.getBody());
+        } catch (HttpClientErrorException e) {
+            // Gérer les erreurs HTTP spécifiques
+            System.out.println("Erreur HTTP : " + e.getStatusCode() + " - " + e.getResponseBodyAsString());
+        } catch (Exception e) {
+            // Gérer d'autres exceptions
+            System.out.println("Une erreur s'est produite : " + e.getMessage());
+        }
+
+        // En cas d'erreur, retourner false
+        return false;
     }
 
     public void updateCardStatus(UUID cardRequestId, String status) {
@@ -196,7 +228,51 @@ public class CardOrchestratorService {
             CardRequest cardRequest = optionalCardRequest.get();
             cardRequest.setStatus(status);
             cardRequestRepository.save(cardRequest);
+
         }
+    }
+
+    public void saveCardRequest(CardRequest cardRequest) {
+        CardRequestDto cardRequestDto = new CardRequestDto();
+        cardRequestDto.setAttack(cardRequest.getAttack());
+        cardRequestDto.setDefence(cardRequest.getDefense());
+        cardRequestDto.setEnergy(cardRequest.getEnergy());
+        cardRequestDto.setHp(cardRequest.getHp());
+        cardRequestDto.setPrice(10);
+        cardRequestDto.setUserId(Integer.parseInt(cardRequest.getUserId()));
+
+        try {
+            // URL de l'endpoint pour ajouter une carte
+            String url = "http://localhost:8080/card"; // Remplacez le port et le domaine si nécessaire
+
+            // Créer une instance de RestTemplate
+            RestTemplate restTemplate = new RestTemplate();
+
+            // Préparer les en-têtes HTTP
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+
+            // Créer l'entité HTTP avec les en-têtes et le corps de la requête
+            HttpEntity<CardRequestDto> requestEntity = new HttpEntity<>(cardRequestDto, headers);
+
+            // Envoyer la requête POST à l'endpoint /card
+            ResponseEntity<CardRequestDto> response = restTemplate.exchange(
+                    url,
+                    HttpMethod.POST,
+                    requestEntity,
+                    CardRequestDto.class);
+
+            // Traiter la réponse
+            CardRequestDto responseBody = response.getBody();
+            System.out.println("Card added successfully: " + responseBody);
+        } catch (HttpClientErrorException e) {
+            // Gérer les erreurs HTTP spécifiques
+            System.out.println("Erreur HTTP : " + e.getStatusCode() + " - " + e.getResponseBodyAsString());
+        } catch (Exception e) {
+            // Gérer d'autres exceptions
+            System.out.println("Une erreur s'est produite : " + e.getMessage());
+        }
+
     }
 
     public static String extractAndTransformUrl(String jsonString) {

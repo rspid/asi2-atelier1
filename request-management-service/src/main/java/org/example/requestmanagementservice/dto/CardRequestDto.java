@@ -3,68 +3,72 @@ package org.example.requestmanagementservice.dto;
 import java.util.Map;
 
 public class CardRequestDto {
-    private String userId;
-    private String promptImage;
-    private String promptText;
-    private Float hp;
-    private Float attack;
-    private Float defense;
-    private Float energy;
+    private Integer id;
+    private float energy;
+    private float hp;
+    private float defence;
+    private float attack;
+    private float price;
+    private Integer userId;
 
-    // Getters et Setters
-    public String getUserId() {
-        return userId;
+    public void CardDTO() {
+
     }
 
-    public void setUserId(String userId) {
-        this.userId = userId;
+    public Integer getId() {
+        return id;
     }
 
-    public String getPromptImage() {
-        return promptImage;
+    public void setId(Integer id) {
+        this.id = id;
     }
 
-    public void setPromptImage(String promptImage) {
-        this.promptImage = promptImage;
-    }
-
-    public String getPromptText() {
-        return promptText;
-    }
-
-    public void setPromptText(String promptText) {
-        this.promptText = promptText;
-    }
-
-    public Float getHp() {
-        return hp;
-    }
-
-    public void setHp(Float hp) {
-        this.hp = hp;
-    }
-
-    public Float getAttack() {
-        return attack;
-    }
-
-    public void setAttack(Float attack) {
-        this.attack = attack;
-    }
-
-    public Float getDefense() {
-        return defense;
-    }
-
-    public void setDefense(Float defense) {
-        this.defense = defense;
-    }
-
-    public Float getEnergy() {
+    public float getEnergy() {
         return energy;
     }
 
-    public void setEnergy(Float energy) {
+    public void setEnergy(float energy) {
         this.energy = energy;
     }
+
+    public float getHp() {
+        return hp;
+    }
+
+    public void setHp(float hp) {
+        this.hp = hp;
+    }
+
+    public float getDefence() {
+        return defence;
+    }
+
+    public void setDefence(float defence) {
+        this.defence = defence;
+    }
+
+    public float getAttack() {
+        return attack;
+    }
+
+    public void setAttack(float attack) {
+        this.attack = attack;
+    }
+
+    public float getPrice() {
+        return price;
+    }
+
+    public void setPrice(float price) {
+        this.price = price;
+    }
+
+    public Integer getUserId() {
+        return userId;
+    }
+
+    public void setUserId(Integer userId) {
+        this.userId = userId;
+    }
+
 }

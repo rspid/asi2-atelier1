@@ -38,11 +38,13 @@
 <!-- 		<artifactId>activemq-broker</artifactId> -->
 <!-- 		</dependency> -->
 
-<!-- 		<dependency> -->
-<!-- 			<groupId>mysql</groupId> -->
-<!-- 			<artifactId>mysql-connector-java</artifactId> -->
-<!-- 			<scope>runtime</scope> -->
-<!-- 		</dependency> -->
+		<!-- MySQL Connector (ajout de la version) -->
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+            <version>8.0.33</version>
+            <scope>runtime</scope>
+        </dependency> 
 		
 		<dependency>
 			<groupId>com.h2database</groupId>
