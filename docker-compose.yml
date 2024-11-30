@@ -4,17 +4,15 @@ services:
     image: mysql:latest
     container_name: asi2-atelier1-db
     environment:
-      MYSQL_ROOT_PASSWORD: admin
+      MYSQL_ROOT_PASSWORD: "admin"
       MYSQL_DATABASE: request_management_db
-      MYSQL_USER: root
-      MYSQL_PASSWORD: admin
     volumes:
       - mysqldata:/var/lib/mysql
     networks:
       - mynetwork
     ports:
       - "3306:3306"
-
+  
   discovery-service:
     build: ./discovery-service
     container_name: discovery-service
@@ -44,6 +42,7 @@ services:
       - mynetwork
     depends_on:
       - discovery-service
+      - asi2-atelier1-db
   
   text-generation-service:
     build: ./text-generation-service

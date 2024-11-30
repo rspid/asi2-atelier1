@@ -1,11 +1,11 @@
 package org.example.imagegenerationservice;
 
-import org.example.imagegenerationservice.model.ImageGenerationRequest;
 import org.example.imagegenerationservice.service.MessageQueueService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+
 
 @SpringBootApplication
 public class ImageGenerationServiceApplication implements CommandLineRunner {
