@@ -18,9 +18,10 @@ public class CardOrchestratorController {
     private CardOrchestratorService cardOrchestratorService;
 
     @PostMapping("/create")
-    public ResponseEntity<CardRequest> createCard() {
+    public ResponseEntity<CardRequest> createCard(@RequestBody OrchestratorRequest request) {
         // Appelle le service pour gérer la création de la carte
-        CardRequest cardRequest = cardOrchestratorService.createCardRequest();
+        System.out.println("\n\n\nController create: User Id: " + request.getUserId());
+        CardRequest cardRequest = cardOrchestratorService.createCardRequest(request.getUserId());
         return ResponseEntity.ok(cardRequest); // Retourne la réponse initiale
     }
 
