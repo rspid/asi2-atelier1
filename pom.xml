@@ -15,5 +15,10 @@
         <module>property-calculation-service</module>
         <module>request-management-service</module>
         <module>backend</module>
+        <module>discovery-service</module>
+        <module>api-gateway</module>
+
+
+
     </modules>
 </project>
