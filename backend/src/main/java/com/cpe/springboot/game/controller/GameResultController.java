@@ -16,11 +16,15 @@ public class GameResultController {
 
     @PostMapping
     public ResponseEntity<GameResultModel> createGameResult(@RequestBody GameResultModel gameResultModel) {
+        System.out.println("Received request: " + gameResultModel);
         try {
             GameResultModel savedResult = gameResultService.saveGameResult(gameResultModel);
+            System.out.println("Saved result: " + savedResult);
             return new ResponseEntity<>(savedResult, HttpStatus.CREATED);
         } catch (Exception e) {
+            e.printStackTrace();
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
 }

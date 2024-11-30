@@ -1,15 +1,14 @@
 package com.cpe.springboot.game.model;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
 
 @Entity
 public class GameResultModel {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private Integer id;
+    private Integer gameId; // Utilisé comme clé primaire
 
-    private Integer gameId;
     private Integer idGagnant;
     private Integer idPerdant;
 
@@ -20,14 +19,6 @@ public class GameResultModel {
         this.gameId = gameId;
         this.idGagnant = idGagnant;
         this.idPerdant = idPerdant;
-    }
-
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
     }
 
     public Integer getGameId() {
