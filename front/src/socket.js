@@ -3,11 +3,12 @@ import { io } from "socket.io-client";
 let socket;
 
 export const initSocket = () => {
-  socket = io("http://localhost:3000", {
+  socket = io("http://localhost:8080", {
     autoConnect: false,
     reconnection: true,
     reconnectionAttempts: 5,
     reconnectionDelay: 1000,
+    path: "/socket.io"
   });
 
   // Gestionnaires d'événements de connexion

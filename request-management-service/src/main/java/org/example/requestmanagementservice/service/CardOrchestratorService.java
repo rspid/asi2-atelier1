@@ -167,7 +167,7 @@ public class CardOrchestratorService {
             // Construire le corps de la requête pour l'API d'image
             Map<String, Object> requestBody = new HashMap<>();
             requestBody.put("requestId", cardRequestId.toString());
-            requestBody.put("imageUrl", extractAndTransformUrl(imageUrl));
+            requestBody.put("imageUrl", extractAndTransformUrl(imageUrl, gatewayServiceUrl));
 
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
@@ -248,6 +248,15 @@ public class CardOrchestratorService {
         try {
             // Utiliser l'URL injectée
             String cardEndpoint = backendServiceUrl + "/card";
+
+            RestTemplate restTemplate = new RestTemplate();
+
+            // Préparer les en-têtes HTTP
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+
+            // Créer l'entité HTTP avec les en-têtes et le corps de la requête
+            HttpEntity<CardRequestDto> requestEntity = new HttpEntity<>(cardRequestDto, headers);
             ResponseEntity<CardRequestDto> response = restTemplate.exchange(
                     cardEndpoint,
                     HttpMethod.POST,
@@ -263,7 +272,7 @@ public class CardOrchestratorService {
 
     }
 
-    public static String extractAndTransformUrl(String jsonString) {
+    public static String extractAndTransformUrl(String jsonString, String gatewayUrl) {
         // Expression régulière pour extraire la valeur de "url"
         String regex = "\"url\"\\s*:\\s*\"(.*?)\"";
         Pattern pattern = Pattern.compile(regex);
@@ -276,7 +285,7 @@ public class CardOrchestratorService {
             String cleanedPath = extractedUrl.replaceFirst("^/static/", "");
 
             // Ajouter "localhost:8080/" devant le chemin nettoyé
-            String finalUrl = gatewayServiceUrl + cleanedPath;
+            String finalUrl = gatewayUrl + cleanedPath;
 
             return finalUrl;
         } else {

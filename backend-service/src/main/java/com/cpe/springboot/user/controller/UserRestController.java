@@ -67,8 +67,21 @@ public class UserRestController {
 		userService.deleteUser(id);
 	}
 
+	// @RequestMapping(method = RequestMethod.POST, value = "/auth")
+	// private Integer getAllCourses(@RequestBody AuthDTO authDto) {
+	// 	try {
+	// 		List<UserModel> uList = userService.getUserByLoginPwd(authDto.getUsername(), authDto.getPassword());
+	// 		if (!uList.isEmpty()) {
+	// 			return ResponseEntity.ok(uList.get(0).getId());
+	// 		}
+	// 		return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid credentials");
+	// 	} catch (Exception e) {
+	// 		return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Authentication error");
+	// 	}
+	// }
+
 	@RequestMapping(method = RequestMethod.POST, value = "/auth")
-	private Integer getAllCourses(@RequestBody AuthDTO authDto) {
+	private ResponseEntity<?> getAllCourses(@RequestBody AuthDTO authDto) {
 		try {
 			List<UserModel> uList = userService.getUserByLoginPwd(authDto.getUsername(), authDto.getPassword());
 			if (!uList.isEmpty()) {

@@ -8,3 +8,4 @@
 .DS_Store
 
 /front/node_modules
+/game-node-service/node_modules

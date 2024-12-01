@@ -86,4 +86,12 @@ public class OrchestratorRequest {
     public void setUserId(String userId) {
         this.userId = userId;
     }
+
+    public String getPrompt() {
+        return prompt;
+    }
+
+    public void setPrompt(String prompt) {
+        this.prompt = prompt;
+    }
 }

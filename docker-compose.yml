@@ -44,6 +44,17 @@ services:
       - mynetwork
     depends_on:
       - discovery-service
+
+  game-node-service:
+    build: ./game-node-service
+    container_name: game-node-service
+    ports:
+      - "3000:3000"  
+    networks:
+      - mynetwork
+    depends_on:
+      - activemq
+      - discovery-service
   
   
   text-generation-service:
@@ -77,7 +88,7 @@ services:
       - discovery-service
   
   backend-service:
-    build: ./backend
+    build: ./backend-service
     container_name: backend-service
     ports:
       - "8084:8084"
