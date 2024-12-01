@@ -3,11 +3,11 @@ const Stomp = require('stomp-client');
 // Configuration de l'ESB (ActiveMQ)
 const activeMqHost = 'activemq';
 const activeMqPort = 61613;       // Port STOMP par défaut
-const queueName = '/queue/messages'; // Nom de la queue où envoyer les messages
+const queueName = '/queue/messageQueue'; // Nom de la queue où envoyer les messages
 const username = 'myuser';        // Nom d'utilisateur ActiveMQ
 const password = 'mypwd';         // Mot de passe ActiveMQ
 
-const client = new Stomp(`tcp://${activeMqHost}`, activeMqPort, username, password);
+const client = new Stomp(activeMqHost, activeMqPort, username, password);
 
 
 function handleChat(io, socket, battleRooms) {
