@@ -1,6 +1,15 @@
 # Projet de Microservices
 
-Ce projet est une application distribuée basée sur une architecture de microservices, permettant la gestion d'une application interactive de cartes.
+---
+
+## ℹ️ Info
+Le dernier code à jour se trouve dans la branche `atelier3` de notre [dépôt GitHub](https://github.com/rspid/asi2-atelier1/tree/atelier3).
+
+---
+
+## 🎥 Démonstration Vidéo
+Découvrez la démo de notre application sur YouTube :  
+[👉 Regarder la vidéo](https://www.youtube.com/watch?v=LIEN_DE_VOTRE_VIDEO)
 
 ---
 
@@ -36,6 +45,7 @@ Ce projet est une application distribuée basée sur une architecture de microse
 ---
 
 ## ❌ Fonctionnalités Non Réalisées
+- **Calcul des propriétés** : Le service n'est pas encore opérationnel et doit être intégré.
 - **CI/CD** : Les pipelines pour la génération des images Docker et leur hébergement sur le Container Registry de GitLab n'ont pas été configurés.
 
 ---
@@ -60,3 +70,4 @@ Ce projet est une application distribuée basée sur une architecture de microse
 ### Accéder à l'Application Web :
 - Ouvrez votre navigateur et rendez-vous à l'adresse suivante : `http://localhost:8080`
 
+---
