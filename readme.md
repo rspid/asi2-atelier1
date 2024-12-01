@@ -9,7 +9,7 @@ Le dernier code à jour se trouve dans la branche `atelier3` de notre [dépôt G
 
 ## 🎥 Démonstration Vidéo
 Découvrez la démo de notre application sur YouTube :  
-[👉 Regarder la vidéo](https://www.youtube.com/watch?v=LIEN_DE_VOTRE_VIDEO)
+[👉 Regarder la vidéo](https://www.youtube.com/watch?v=gldVo2vVI38)
 
 ---
 
