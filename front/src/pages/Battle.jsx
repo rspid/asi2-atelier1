@@ -8,7 +8,7 @@ import { UserContext } from "../context/UserContext";
 import { getSocket } from "../socket";
 
 const Battle = () => {
-  const { user } = useContext(UserContext);
+  const { user, cards, setCards } = useContext(UserContext);
   const socket = getSocket();
   const navigate = useNavigate();
   const [isConnected, setIsConnected] = useState(socket?.connected || false);
@@ -19,6 +19,15 @@ const Battle = () => {
   const [gameData, setGameData] = useState(null);
   const [selectedCard, setSelectedCard] = useState(null);
   const location = useLocation();
+
+  useEffect(() => {
+    if (cards.length === 0) {
+      fetch("/api/spring/cards")
+        .then((response) => response.json())
+        .then((data) => setCards(data));
+    }
+  }, []);
+  const userCards = cards.filter((card) => user.cardList.includes(card.id));
 
   useEffect(() => {
     if (!socket) return;
@@ -136,6 +145,12 @@ const Battle = () => {
     return `${mins}:${secs.toString().padStart(2, "0")}`;
   };
 
+  if (userCards.length === 0) {
+    return <div>Loading...</div>;
+  }
+
+  console.log("userCards", userCards);
+
   return (
     <div className="h-screen bg-black text-white flex flex-col font-body">
       <Header />
@@ -147,6 +162,7 @@ const Battle = () => {
               userId={user.id}
               setIsConnected={setIsConnected}
               isConnected={isConnected}
+              userCards={userCards}
             />
           </div>
         ) : gameState === "searching" ? (
@@ -161,6 +177,7 @@ const Battle = () => {
               userId={user.id}
               setIsConnected={setIsConnected}
               isConnected={isConnected}
+              userCards={userCards}
             />
           </div>
         ) : (

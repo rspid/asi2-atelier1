@@ -1,7 +1,7 @@
 const BattleManager = require("../game/BattleManager");
 const battleManager = new BattleManager();
 
-function handleBattle(io, socket, battleRooms) {
+function handleBattle(io, socket, battleRooms,userCardsMap) {
   console.log("🎮 Début handleBattle pour socket:", socket.id);
   console.log(
     "📊 État actuel des battleRooms:",
@@ -20,12 +20,23 @@ function handleBattle(io, socket, battleRooms) {
       room.players.push(socket.id);
       opponentFound = true;
 
+      const player1SocketId = room.players[0];
+      const player2SocketId = socket.id;
+      console.log("userCardsMap", userCardsMap);
+
+      const player1Cards = Array.from(userCardsMap.values())[0];
+      const player2Cards =  Array.from(userCardsMap.values())[1];
+
+      console.log("player1Cards", player1Cards);
+      console.log("player2Cards", player2Cards);
+
       // Initialiser la bataille dans le BattleManager
       const battleState = battleManager.createBattle(
         roomId,
-        room.players[0], // Premier joueur
-        socket.id, // Deuxième joueur
-        room.players[0]
+        player1SocketId,
+        player2SocketId,
+        player1Cards,
+        player2Cards
       );
 
       console.log(`🎲 Battle créée dans room ${roomId}:`, battleState);

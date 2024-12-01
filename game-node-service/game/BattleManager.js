@@ -3,18 +3,18 @@ class BattleManager {
     this.battles = new Map();
   }
 
-  createBattle(roomId, player1Id, player2Id) {
+  createBattle(roomId, player1Id, player2Id, player1Cards, player2Cards) {
     const battle = {
       id: roomId,
       players: [
         {
           id: player1Id,
-          cards: this.generateInitialCards(player1Id),
+          cards: player1Cards,
           energy: 1,
         },
         {
           id: player2Id,
-          cards: this.generateInitialCards(player2Id),
+          cards: player2Cards,
           energy: 1,
         },
       ],

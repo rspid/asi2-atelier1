@@ -8,12 +8,14 @@ function initializeSocket(io) {
   const battleRooms = new Map();
 
   const usersInBattle = new Map();
+  const userCardsMap = new Map();
 
   io.on("connection", (socket) => {
     console.log("🟢 User connected:", socket.id);
 
-    socket.on("join_battle", ({ userId }) => {
+    socket.on("join_battle", ({ userId,userCards }) => {
       // Vérifier si l'utilisateur est déjà en bataille
+
       if (usersInBattle.has(userId)) {
         console.log(`⚠️ User ${userId} is already in battle`);
         return;
@@ -21,9 +23,9 @@ function initializeSocket(io) {
       console.log(`👤 User ${userId} (Socket: ${socket.id}) joining battle`);
       usersInBattle.set(userId, socket.id);
       connectedUsers.set(socket.id, userId);
-
+      userCardsMap.set(userId, userCards);
       // Gérer d'abord la bataille
-      handleBattle(io, socket, battleRooms);
+      handleBattle(io, socket, battleRooms,userCardsMap);
 
       // Puis initialiser le chat pour la même room
       handleChat(io, socket, battleRooms);
@@ -58,6 +60,7 @@ function initializeSocket(io) {
       connectedUsers.delete(socket.id);
       if (userId) {
         usersInBattle.delete(userId);
+        userCardsMap.delete(userId);
       }
     });
   });

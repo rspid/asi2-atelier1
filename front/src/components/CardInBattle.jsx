@@ -58,7 +58,8 @@ const CardInBattle = ({
       </div>
 
       <img
-        src={"/images/magic.jpg"}
+        // src={"/images/magic.jpg"}
+        src={card.imgUrl}
         alt={card.name}
         className="object-cover w-full h-full pt-8"
       />

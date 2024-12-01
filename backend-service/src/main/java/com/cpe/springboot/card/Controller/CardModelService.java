@@ -20,6 +20,10 @@ public class CardModelService {
 	private final CardReferenceService cardRefService;
 	private Random rand;
 
+	private static final float[] POSSIBLE_ATTACKS = {10, 20, 30, 40, 50, 60, 70, 80, 90, 100};
+    private static final float[] POSSIBLE_DEFENSE = {15, 25, 35, 45, 55, 65, 75, 85, 95};
+    private static final float[] POSSIBLE_HP = {20, 30, 40, 50, 60, 70, 80, 90, 100};
+
 	public CardModelService(CardModelRepository cardRepository,CardReferenceService cardRefService) {
 		this.rand=new Random();
 		// Dependencies injection by constructor
@@ -59,17 +63,27 @@ public class CardModelService {
 		for(int i=0;i<nbr;i++) {
 			CardReference currentCardRef=cardRefService.getRandCardRef();
 			CardModel currentCard=new CardModel(currentCardRef);
-			currentCard.setAttack(rand.nextFloat()*100);
-			currentCard.setDefence(rand.nextFloat()*100);
-			currentCard.setEnergy(100);
-			currentCard.setHp(rand.nextFloat()*100);
-			currentCard.setPrice(currentCard.computePrice());
+			currentCard.setAttack(POSSIBLE_ATTACKS[rand.nextInt(POSSIBLE_ATTACKS.length)]);
+            currentCard.setDefence(POSSIBLE_DEFENSE[rand.nextInt(POSSIBLE_DEFENSE.length)]);
+            currentCard.setHp(POSSIBLE_HP[rand.nextInt(POSSIBLE_HP.length)]);
+            
+            // Calcul de l'énergie basé sur l'attaque
+            currentCard.setEnergy(calculateCardEnergy(currentCard.getAttack()));
+            
+            // Calcul du prix basé sur les statistiques
+            currentCard.setPrice(currentCard.computePrice());
 			//save new card before sending for user creation
 			//this.addCard(currentCard);
 			cardList.add(currentCard);
 		}
 		return cardList;
 	}
+
+	private int calculateCardEnergy(float attack) {
+        if (attack < 40) return 1;
+        if (attack < 70) return 2;
+        return 3;
+    }
 
 
 	public List<CardModel> getAllCardToSell(){

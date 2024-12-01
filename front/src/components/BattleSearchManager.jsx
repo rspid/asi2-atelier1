@@ -5,11 +5,12 @@ export function BattleSearchManager({
   userId,
   setIsConnected,
   isConnected,
+  userCards,
 }) {
   function startSearch() {
     const socket = initSocket();
     socket.connect();
-    socket.emit("join_battle", { userId });
+    socket.emit("join_battle", { userId, userCards });
     setIsConnected(true);
     onSearchStart();
   }
