@@ -1,17 +1,19 @@
 services:
 
-  asi2-atelier1-db:
-    image: mysql:latest
-    container_name: asi2-atelier1-db
+  postgres:
+    image: postgres:13.4
+    container_name: postgres
+    ports:
+      - "5432:5432"
     environment:
-      MYSQL_ROOT_PASSWORD: "admin"
-      MYSQL_DATABASE: request_management_db
+      POSTGRES_DB: "card-db"
+      POSTGRES_USER: "admin"
+      POSTGRES_PASSWORD: "admin"
     volumes:
-      - mysqldata:/var/lib/mysql
+      - postgres_data:/var/lib/postgresql/data
+      - ./init-scripts/init.sql:/docker-entrypoint-initdb.d/init.sql
     networks:
       - mynetwork
-    ports:
-      - "3306:3306"
   
   discovery-service:
     build: ./discovery-service
@@ -21,34 +23,34 @@ services:
     networks:
       - mynetwork
     depends_on:
-      - asi2-atelier1-db
+      - postgres
 
-  api-gateway:
-    build: ./api-gateway
-    container_name: api-gateway
+  reverse-proxy:
+    build: ./reverse-proxy
+    container_name: reverse-proxy
     ports:
-      - "8000:8000" # Port API Gateway
+      - "8080:8080"
     networks:
       - mynetwork
     depends_on:
       - discovery-service
 
-  orchestrator:
+  request-management-service:
     build: ./request-management-service
-    container_name: orchestrator
+    container_name: request-management-service
     ports:
-      - "7070:7070" # Port interne 8080 mappé au port externe 8084
+      - "7070:7070" 
     networks:
       - mynetwork
     depends_on:
       - discovery-service
-      - asi2-atelier1-db
+  
   
   text-generation-service:
     build: ./text-generation-service
     container_name: text-generation-service
     ports:
-      - "8083:8083" # Port interne 8080 mappé au port externe 8085
+      - "8083:8083" 
     networks:
       - mynetwork
     depends_on:
@@ -78,11 +80,12 @@ services:
     build: ./backend
     container_name: backend-service
     ports:
-      - "8088:8080" # Port interne 8080 mappé au port externe 8088
+      - "8084:8084"
     networks:
       - mynetwork
     depends_on:
       - discovery-service
+      - activemq
   
   activemq:
     image: symptoma/activemq:5.18.3
@@ -96,11 +99,13 @@ services:
       ACTIVEMQ_PASSWORD: mypwd
       ACTIVEMQ_WEBADMIN_USERNAME: myuserweb
       ACTIVEMQ_WEBADMIN_PASSWORD: mypwd
+    networks:
+      - mynetwork
 
   img-gen-ln:
     image: registry.gitlab.com/js-asi2/asi2-resources/img-gene-neural-love-api:v1.1
     ports:
-      - "8080:8080"
+      - "8082:8080"
     environment:
       external.iaimgapi.token: 'v1.811d96c7bbbd148ae0b4bd54baf8abdfee0d0dbb6f2d4321e6edb49dc30f0abd'
 
@@ -115,6 +120,5 @@ networks:
   mynetwork:
 
 volumes:
-  mysqldata: # Ajout du volume manquant pour asi2-atelier1-db
-  pgdata:
+  postgres_data:
   ollama:

@@ -24,13 +24,17 @@ public class OrchestratorRequest {
     @JsonProperty("properties")
     private Map<String, Float> properties;
 
+    @JsonProperty("prompt")
+    private String prompt;
+
+
     // constructeur vide
     public OrchestratorRequest() {
     }
 
     // Constructeurs, getters et setters
     public OrchestratorRequest(String cardRequestId, String generatedText, String generatedImage, String requestId,
-            String properties) {
+            String properties, String prompt) {
         this.cardRequestId = cardRequestId;
         this.generatedText = generatedText;
     }

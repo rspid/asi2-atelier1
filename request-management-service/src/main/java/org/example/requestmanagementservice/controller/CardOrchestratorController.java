@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.*;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/cards")
 public class CardOrchestratorController {
 
     @Autowired
@@ -19,9 +18,11 @@ public class CardOrchestratorController {
 
     @PostMapping("/create")
     public ResponseEntity<CardRequest> createCard(@RequestBody OrchestratorRequest request) {
-        // Appelle le service pour gérer la création de la carte
+        if (request.getUserId() == null || request.getPrompt() == null) {
+            return ResponseEntity.badRequest().body(null);
+        }
         System.out.println("\n\n\nController create: User Id: " + request.getUserId());
-        CardRequest cardRequest = cardOrchestratorService.createCardRequest(request.getUserId());
+        CardRequest cardRequest = cardOrchestratorService.createCardRequest(request.getUserId(), request.getPrompt());
         return ResponseEntity.ok(cardRequest); // Retourne la réponse initiale
     }
 

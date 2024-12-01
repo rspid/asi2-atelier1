@@ -29,6 +29,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import org.springframework.beans.factory.annotation.Value;
 
 @Service
 public class CardOrchestratorService {
@@ -42,7 +43,22 @@ public class CardOrchestratorService {
     // Champs de classe pour stocker les valeurs
     private UUID cardRequestId;
 
-    public CardRequest createCardRequest(String userId) {
+    @Value("${text.generation.service.url}")
+    private String textServiceUrl;
+
+    @Value("${image.generation.service.url}")
+    private String imageServiceUrl;
+
+    @Value("${property.calculation.service.url}")
+    private String propertyServiceUrl;
+
+    @Value("${backend.service.url}")
+    private String backendServiceUrl;
+
+    @Value("${gateway.service.url}")
+    private String gatewayServiceUrl;
+
+    public CardRequest createCardRequest(String userId, String prompt) {
         // Créer une nouvelle demande de carte et définir son statut initial
         CardRequest cardRequest = new CardRequest();
         cardRequest.setStatus("PROCESSING");
@@ -76,7 +92,7 @@ public class CardOrchestratorService {
             }
 
             // URL du service de génération de texte
-            String textServiceUrl = "http://localhost:8083/api/text";
+            String textServiceUrl = "http://text-generation-service/api/text";
 
             // Préparer la requête de génération de texte
             GenerationRequest generationRequest = new GenerationRequest();
@@ -120,12 +136,12 @@ public class CardOrchestratorService {
 
             HttpEntity<Map<String, Object>> request = new HttpEntity<>(requestBody, headers);
 
-            // Appeler l'API d'image
-            String imageServiceUrl = "http://localhost:8081/api/image";
+            // Utiliser l'URL injectée
+            String imageGenEndpoint = imageServiceUrl + "/api/image";
             try {
                 System.out.println("Calling image service with JSON body: " + requestBody);
                 ResponseEntity<String> response = restTemplate.exchange(
-                        imageServiceUrl,
+                        imageGenEndpoint,
                         HttpMethod.POST,
                         request,
                         String.class);
@@ -158,17 +174,17 @@ public class CardOrchestratorService {
 
             HttpEntity<Map<String, Object>> request = new HttpEntity<>(requestBody, headers);
 
-            // Appeler l'API d'image
-            String imageServiceUrl = "http://localhost:8089/api/properties";
+            // Utiliser l'URL injectée
+            String propertyEndpoint = propertyServiceUrl + "/api/properties";
             try {
                 System.out.println("Calling image service with JSON body: " + requestBody);
                 ResponseEntity<String> response = restTemplate.exchange(
-                        imageServiceUrl,
+                        propertyEndpoint,
                         HttpMethod.POST,
                         request,
                         String.class);
             } catch (Exception e) {
-                System.err.println("Error calling image service: " + e.getMessage());
+                System.err.println("Error calling property service: " + e.getMessage());
             }
             System.out.println("updateImageAndTriggerPropertiesRequest completed : " + cardRequestId + "\n\n\n\n");
         }
@@ -195,31 +211,19 @@ public class CardOrchestratorService {
     }
 
     private boolean debitUser(String userId) {
-        // URL de l'endpoint pour débiter l'utilisateur
-        String url = "http://localhost:8084/user/" + userId + "/debit";
-
+        // Utiliser l'URL injectée
+        String debitEndpoint = backendServiceUrl + "/user/" + userId + "/debit";
         try {
-            // Utiliser RestTemplate pour appeler l'endpoint
-            RestTemplate restTemplate = new RestTemplate();
             ResponseEntity<Boolean> response = restTemplate.exchange(
-                    url,
+                    debitEndpoint,
                     HttpMethod.POST,
                     null,
                     Boolean.class);
-
-            // Retourner directement la réponse (true ou false)
-            System.out.println("User debited successfully: " + response.getBody());
             return Boolean.TRUE.equals(response.getBody());
-        } catch (HttpClientErrorException e) {
-            // Gérer les erreurs HTTP spécifiques
-            System.out.println("Erreur HTTP : " + e.getStatusCode() + " - " + e.getResponseBodyAsString());
         } catch (Exception e) {
-            // Gérer d'autres exceptions
             System.out.println("Une erreur s'est produite : " + e.getMessage());
+            return false;
         }
-
-        // En cas d'erreur, retourner false
-        return false;
     }
 
     public void updateCardStatus(UUID cardRequestId, String status) {
@@ -242,22 +246,10 @@ public class CardOrchestratorService {
         cardRequestDto.setUserId(Integer.parseInt(cardRequest.getUserId()));
 
         try {
-            // URL de l'endpoint pour ajouter une carte
-            String url = "http://localhost:8080/card"; // Remplacez le port et le domaine si nécessaire
-
-            // Créer une instance de RestTemplate
-            RestTemplate restTemplate = new RestTemplate();
-
-            // Préparer les en-têtes HTTP
-            HttpHeaders headers = new HttpHeaders();
-            headers.setContentType(MediaType.APPLICATION_JSON);
-
-            // Créer l'entité HTTP avec les en-têtes et le corps de la requête
-            HttpEntity<CardRequestDto> requestEntity = new HttpEntity<>(cardRequestDto, headers);
-
-            // Envoyer la requête POST à l'endpoint /card
+            // Utiliser l'URL injectée
+            String cardEndpoint = backendServiceUrl + "/card";
             ResponseEntity<CardRequestDto> response = restTemplate.exchange(
-                    url,
+                    cardEndpoint,
                     HttpMethod.POST,
                     requestEntity,
                     CardRequestDto.class);
@@ -265,11 +257,7 @@ public class CardOrchestratorService {
             // Traiter la réponse
             CardRequestDto responseBody = response.getBody();
             System.out.println("Card added successfully: " + responseBody);
-        } catch (HttpClientErrorException e) {
-            // Gérer les erreurs HTTP spécifiques
-            System.out.println("Erreur HTTP : " + e.getStatusCode() + " - " + e.getResponseBodyAsString());
         } catch (Exception e) {
-            // Gérer d'autres exceptions
             System.out.println("Une erreur s'est produite : " + e.getMessage());
         }
 
@@ -288,7 +276,7 @@ public class CardOrchestratorService {
             String cleanedPath = extractedUrl.replaceFirst("^/static/", "");
 
             // Ajouter "localhost:8080/" devant le chemin nettoyé
-            String finalUrl = "http://localhost:8080/" + cleanedPath;
+            String finalUrl = gatewayServiceUrl + cleanedPath;
 
             return finalUrl;
         } else {

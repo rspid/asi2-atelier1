@@ -4,6 +4,7 @@
 /sale-service/target/
 /api-gateway/target/
 /user-service/target/
-/saga-orchestrator/target/
 
 .DS_Store
+
+/front/node_modules
